@@ -2,7 +2,7 @@ import turtle as t
 
 color_list = ['black', 'brown', 'red', 'orange', 'yellow', 'green', 'blue', 'violet', 'grey', 'white']
 screen = t.Screen()
-screen.setup(1000, 800, 50, 50)
+screen.setup(1000, 800, 0, 0)
 pen = t.Turtle()
 pen.speed(0)
 pen.home()
@@ -36,7 +36,6 @@ def draw_resistor(colors, r_value):
     pen.fd(200)
     pen.penup()
     pen.pensize(2)
-    pen.penup()
     pen.home()
     pen.goto(-190,-80)
     pen.pendown()
@@ -59,13 +58,68 @@ def draw_resistor(colors, r_value):
     pen.goto(0,-150)
     pen.write(f'Resistance Value is {r_value:,}{chr(0x03a9)}',False,'center',('Arial',24,'bold'))
 
+def small_resistors(num, resistors, r_total):
+    colors: list[list] = [[ 0 for _ in range(3)] for _ in range(len(resistors))]
 
-def draw_resistors(num,resistors):# Each resistor is around 140 pixels in length
-    r_total = 0
+    for i in range(len(resistors)):
+        digits = [int(digit) for digit in (resistors[i])]
+        count = 0
+        value = int(resistors[i])
+        while value > 9:
+            value = value / 10
+            count += 1
+        colors[i][2] = count-1
+        colors[i][0] = digits[0]
+        colors[i][1] = digits[1]
+        pen.home()
+        pen.goto(-140*len(resistors)/2+i*140,20)
+        pen.pendown()
+        pen.bk(40)
+        pen.penup()
+        pen.home()
+        pen.goto(-140*len(resistors)/2+i*140,0)
+        pen.pendown()
+        pen.fd(100)
+        pen.lt(90)
+        pen.fd(40)
+        pen.lt(90)
+        pen.fd(100)
+        pen.lt(90)
+        pen.fd(40)
+        pen.penup()
+        pen.home()
+        pen.goto(-140*len(resistors)/2+i*140,0)
+        pen.lt(90)
+        for j in range(3):
+            pen.fillcolor(color_list[int(colors[i][j])])
+            pen.begin_fill()
+            pen.fd(40)
+            pen.rt(90)
+            pen.fd(10)
+            pen.rt(90)
+            pen.fd(40)
+            pen.end_fill()
+            pen.lt(90)
+            pen.fd(10)
+            pen.lt(90)
+        pen.penup()
+        pen.home()
+        pen.goto(-140*len(resistors)/2+i*140,-30)
+        pen.write(f'R{i+1}:{resistors[i]}{chr(0x03a9)}', False, 'left',('Arial',14,'bold'))
+    pen.penup()
+    pen.home()
+    pen.goto(-140*len(resistors)/2 + len(resistors) * 130,20)
+    pen.pendown()
+    pen.fd(40)
+    pen.penup()
+    pen.goto(0,-150)
+    pen.write(f'Resistance Value is {r_total:,}{chr(0x03a9)}',False,'center',('Arial',24,'bold'))
+
+def draw_resistors(num,resistors,r_total):# Each resistor is around 140 pixels in length
     for i in range(num):
         pen.penup()
         pen.home()
-        pen.goto(-450+(i*140),50)
+        pen.goto((-150 * num/2) + (i * 100),50)
         pen.pendown()
         pen.fd(20)
         pen.rt(45)
@@ -80,13 +134,12 @@ def draw_resistors(num,resistors):# Each resistor is around 140 pixels in length
         pen.rt(45)
         pen.fd(20)
         pen.penup()
-        pen.goto(-400+(i*140),0)
-        pen.write(f'{resistors[i]} {chr(0x03a9)}',False,"left",('Arial', 18, 'bold'))
-        r_total += int(resistors[i])
+        pen.goto((-135 * num/2) + (i * 100),0)
+        pen.write(f'{resistors[i]} k{chr(0x03a9)}',False,"left",('Arial', 18, 'bold'))
     pen.penup()
     pen.goto(-200,-100)
     pen.pendown()
-    pen.write(f'Total Resistance: {r_total} {chr(0x03a9)}',False, 'left', ('Arial', 24, 'bold'))
+    pen.write(f'Total Resistance: {r_total} k{chr(0x03a9)}',False, 'left', ('Arial', 24, 'bold'))
 
 
 def id_resistor() :
@@ -100,7 +153,7 @@ def id_resistor() :
         color_bands.append(color_list.index(color))
     band1,band2,band3 = color_bands[0],color_bands[1],color_bands[2]
     r_value = (band1*10 + band2) * 10 ** band3
-    draw_resistor(colors,r_value)
+    draw_resistor(colors, r_value) #draw_resistor(colors,r_value)
     x = input('Press enter to continue...')
     menu()
 
@@ -120,12 +173,12 @@ def series_resistors():
     resistance = 0
     resistors = []
     for x in range(num_resistors):
-        resistors.append(input(f'Enter the value of resistor{x+1} in k-ohms: '))
+        resistors.append(input(f'Enter the value of resistor R{x+1} in ohms: '))
     for z in range(num_resistors):
         resistance += float(resistors[z])
     print()
-    print(f'The total resistance of this circuit is {resistance}K ohms')
-    draw_resistors(num_resistors,resistors)
+    print(f'The total resistance of this circuit is {resistance} ohms')
+    small_resistors(num_resistors,resistors,resistance)
     x = input('Press enter to continue...')
     menu()
 
@@ -152,15 +205,15 @@ def parallel_resistors():
     for z in range(num_resistors):
         r_total += float(resistance[z])
     r_total = 1/r_total
-    print(f'The total resistance of this circuit is {r_total}K ohms')
+    print(f'The total resistance of this circuit is {round(r_total, 1)}K ohms')
+    draw_resistors(num_resistors, resistors, resistance)
     x = input('Press enter to continue...')
-    t.clear()
     menu()
 
 
 def menu():
     pen.clear()
-    #t.hideturtle()
+    pen.hideturtle()
     print(40*'*')
     print('*       Resistor ID and utility        *')
     print(40*'*')
