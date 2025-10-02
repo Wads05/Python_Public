@@ -1,3 +1,11 @@
+"""
+Author: Wads05 (J.C. Wadsworth I) 10/1/2025
+Function: This script draws beautiful, colorful, spirals of various size, type, and location
+on the display screen. Making extensive use of the Turtle and Random libraries.
+Designed purely for fun...and to improve my Python skills too :)
+ENJOY !!!
+"""
+
 import turtle
 import random
 # Initialization ... Please adjust the parameters in window.setup to fit your display.
